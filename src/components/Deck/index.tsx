@@ -1,0 +1,43 @@
+import { useState, useEffect } from "react";
+import { House } from "../../../types/house";
+import Card from "../Card";
+
+export default function CardDeck() {
+
+  const [homes, setHomes] = useState<House[]>([]);
+  const [isLoading, setIsLoading] = useState(true); 
+
+  const fetchData = async (url: string) => {
+    try {
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the data');
+        throw error;
+      }
+
+      const data = await res.json();
+      setHomes(data);
+      setIsLoading(false); 
+    } catch (error: any) {
+        throw error;
+    }
+  }
+
+  useEffect(() => {
+    fetchData('/api/homesAPI/homes')
+  }, [])
+
+    if (isLoading) {
+      return <div className="grid-cols-1 mx-auto p-4 bg-white rounded-2xl shadow-lg">
+                Loading Homes...
+              </div>
+    } else {
+      return (
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto">
+          {homes.map(home => <Card home={home}/>)}
+        </div>
+      )
+    }
+}
+
