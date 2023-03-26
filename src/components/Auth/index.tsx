@@ -1,13 +1,21 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { UserClient } from "../../../types/user";
+import SignInForm from "../Forms/SignInForm/SignInForm";
 
-export default function Auth() {
+interface AuthProps {
+    handleSignIn: (user: UserClient) => void
+}
+
+export default function Auth(props: AuthProps) {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [emailValid, setEmailValid] = useState<boolean>(false);
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
     const [submitAllowed, setSubmitAllowed] = useState<boolean>(false);
+    const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
+    const { handleSignIn } = props;
 
     const handleEmailChange = (e: FormEvent<HTMLInputElement>) => {
         console.log(e.currentTarget.value);
@@ -38,13 +46,39 @@ export default function Auth() {
         }
     }
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(e);
+    const authenticateUser = async (email: string, password: string) => {
+        const req = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({email, password})
+          };
+
+          try {
+            const res = await fetch('/api/authAPI/userAuth', req);
+      
+            if (!res.ok) {
+              const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the user data');
+              throw error;
+            }
+      
+            const data = await res.json();
+            const { usrObj: user } = data;
+            localStorage.setItem('user', JSON.stringify(user));
+            setUserAuthenticated(true);
+            handleSignIn(user);
+            
+          } catch (error: any) {
+              console.error(error)
+              throw error;
+          }
     }
 
-
-
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        authenticateUser(email, password);
+    }
 
     return(
         <>
@@ -57,49 +91,25 @@ export default function Auth() {
                     </div>
                     <div className="flex flex-row h-screen items-center">
                         <div className="basis-full flex justify-center">
-                            {/* Container for Form */}
                             <div className="mx-auto w-1/2">
-                                <h2 className="text-2xl px-0 mb-5">Sign In</h2>
-                                <form onSubmit={handleSubmit}>
-                                        <div className="flex flex-col gap-5">
-                                            <input type="email"
-                                                   name="email"
-                                                   id="email"
-                                                   placeholder="Enter email"
-                                                   onChange={(e) => handleEmailChange(e)}
-                                                   className="border-2 border-gray-200 text-sm rounded-md w-full p-3"
-                                                   autoFocus={true}
-                                            />
-                                            <input type="password"
-                                                   name="password"
-                                                   id="password"
-                                                   placeholder="Enter password"
-                                                   onChange={(e) => handlePasswordChange(e)}
-                                                   className="border-2 border-gray-200 text-sm rounded-md w-full p-3"
-                                            />
-                                            {submitAllowed
-                                                ? <button type="submit" className="w-full bg-blue-500 text-white p-3 rounded">
-                                                    Login
-                                                  </button>
-                                                : <button className="w-full bg-gray-300 text-white p-3 rounded">
-                                                    Login
-                                                  </button>
-                                            }
-                                        </div>
-                                    <div className="text-end">
-                                        <a className="text-secondary text-sm underline text-right mt-1" href="#forgotpassword">Forgot password?</a>
-                                    </div>
-                                </form>
+                                {
+                                    userAuthenticated
+                                        ? <div>Welcome User</div>
+                                        : <SignInForm 
+                                            handleSubmit = {handleSubmit}
+                                            handleEmailChange = {handleEmailChange}
+                                            handlePasswordChange = {handlePasswordChange}
+                                            submitAllowed = {submitAllowed} />
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="flex-col basis-[43%]" >
                     <div className="relative h-screen w-[100%]">
-                        <Image src='/auth.png' alt="Blue House" layout="fill"/>
+                        <Image src='/house.png' layout="fill"/>
                     </div>
                 </div>
-
             </div>
         </>
 

@@ -1,13 +1,28 @@
 import type { NextPage } from "next"
-import Auth from "../components/Auth"
+import { useState, useEffect } from "react"
 import CardDeck from "../components/Deck"
+import Auth from "../components/Auth"
+import { UserClient } from "../../types/user"
 
 const Home: NextPage = () => {
-  return (
-    <Auth />
-  )
+
+  const [user, setUser] = useState<UserClient | null>(null);
+
+  const handleSignIn = (user: UserClient) => {
+    setUser(user);
+  }
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      handleSignIn(user);
+    }
+  }, [])
+
+  return user
+    ? < CardDeck />
+    : <Auth handleSignIn = {handleSignIn}/>
 }
 
 export default Home
-
-

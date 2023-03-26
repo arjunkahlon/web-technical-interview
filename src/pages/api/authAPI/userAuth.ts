@@ -28,8 +28,8 @@ export default async function handler(
     } else {
         if (user.password === password) {
           const { id, firstname, lastname } = user;
-          const resObj = { email, id, firstname, lastname };
-          res.json({ resObj });
+          const usrObj = { email, id, firstname, lastname };
+          res.json({ usrObj });
         } else {
           res.status(401).json({Error: 'Invalid Login Credentials'})
       }

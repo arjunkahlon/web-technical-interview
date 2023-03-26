@@ -12,7 +12,7 @@ export default function CardDeck() {
       const res = await fetch(url);
 
       if (!res.ok) {
-        const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the data');
+        const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the house data');
         throw error;
       }
 
