@@ -2,7 +2,7 @@ import Image from "next/image";
 import { House } from "../../../types/house";
 
 interface CardProps {
-    home: House;
+    home: House
 }
 
 export default function Card(props : CardProps) {
@@ -10,7 +10,7 @@ export default function Card(props : CardProps) {
     const { home } = props;
 
     return (
-            <div id={home.id.toString()} className="p-4">
+            <div className="p-4">
                 <div className="overflow-hidden shadow-lg rounded-2xl">
                     <Image src='/house.png' alt="Picture of house" width={300} height={350} className='rounded-xl'/>
                     <div className="relative max-w-full p-5 -mt-14 bg-white rounded-xl">

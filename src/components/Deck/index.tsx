@@ -29,15 +29,14 @@ export default function CardDeck() {
   }, [])
 
     if (isLoading) {
-      return <div className="grid-cols-1 mx-auto p-4 bg-white rounded-2xl shadow-lg">
-                Loading Homes...
-              </div>
+      return <div>isLoading</div>
     } else {
       return (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto">
-          {homes.map(home => <Card home={home}/>)}
+        <div className="flex flex-row">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto">
+            {homes.map((home, index) => <Card home={home} key={index}/>)}
+          </div>
         </div>
       )
     }
 }
-
