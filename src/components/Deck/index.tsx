@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { House } from "../../../types/house";
 import Card from "../Card";
+import { House } from "../../../types/house";
+
 
 export default function CardDeck() {
 
   const [homes, setHomes] = useState<House[]>([]);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadErr, setLoadErr] = useState(false); 
 
   const fetchData = async (url: string) => {
     try {
@@ -13,14 +15,14 @@ export default function CardDeck() {
 
       if (!res.ok) {
         const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the house data');
-        throw error;
+        setLoadErr(true);
+      } else {
+        const data = await res.json();
+        setHomes(data);
+        setIsLoading(false); 
       }
-
-      const data = await res.json();
-      setHomes(data);
-      setIsLoading(false); 
     } catch (error: any) {
-        throw error;
+        setLoadErr(true);
     }
   }
 
@@ -29,7 +31,15 @@ export default function CardDeck() {
   }, [])
 
     if (isLoading) {
-      return <div>isLoading</div>
+      return (
+        <div className="flex flex-row">
+          <div className="grid-cols-1 mx-auto">
+            <div className="p-4 ">
+              <h2 className="text-primary text-2xl">Loading Homes...</h2>
+            </div>
+          </div>
+        </div>
+      )
     } else {
       return (
         <div className="flex flex-row">

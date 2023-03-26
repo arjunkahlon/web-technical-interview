@@ -1,8 +1,8 @@
-import type { NextPage } from "next"
-import { useState, useEffect } from "react"
-import CardDeck from "../components/Deck"
-import Auth from "../components/Auth"
-import { UserClient } from "../../types/user"
+import type { NextPage } from "next";
+import { useState, useEffect } from "react";
+import CardDeck from "../components/Deck";
+import Auth from "../components/Auth";
+import { UserClient } from "../../types/user";
 
 const Home: NextPage = () => {
 
@@ -21,7 +21,7 @@ const Home: NextPage = () => {
   }, [])
 
   return user
-    ? < CardDeck />
+    ? <CardDeck />
     : <Auth handleSignIn = {handleSignIn}/>
 }
 

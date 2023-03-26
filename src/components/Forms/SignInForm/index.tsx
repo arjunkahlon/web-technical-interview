@@ -38,7 +38,7 @@ export default function SignInForm(props: SignInProps) {
                 }
             </div>
             <div className="text-end">
-                <a className="text-sm font-bold text-right text-secondary underline mt-1" href="#forgotpassword">Forgot password?</a>
+                <a className="text-sm text-secondary underline mt-1" href="#forgotpassword">Forgot password?</a>
             </div>
         </form>
     )

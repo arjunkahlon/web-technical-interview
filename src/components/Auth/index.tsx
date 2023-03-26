@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import SignInForm from "../Forms/SignInForm";
 import { UserClient } from "../../../types/user";
-import SignInForm from "../Forms/SignInForm/SignInForm";
 
 interface AuthProps {
     handleSignIn: (user: UserClient) => void
@@ -15,10 +15,11 @@ export default function Auth(props: AuthProps) {
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
     const [submitAllowed, setSubmitAllowed] = useState<boolean>(false);
     const [userAuthenticated, setUserAuthenticated] = useState<boolean>(false);
+    const [userAuthErr, setUserAuthErr] = useState<boolean>(false);
     const { handleSignIn } = props;
 
     const handleEmailChange = (e: FormEvent<HTMLInputElement>) => {
-        console.log(e.currentTarget.value);
+        setUserAuthErr(false);
         let validEmail = e.currentTarget.value ? true : false;
         validEmail ? setEmailValid(true) : setEmailValid(false);
         setEmail(e.currentTarget.value)
@@ -33,9 +34,9 @@ export default function Auth(props: AuthProps) {
     }
 
     const handlePasswordChange = (e: FormEvent<HTMLInputElement>) => {
+        setUserAuthErr(false);
         let validPassword = e.currentTarget.value ? true : false;
         validPassword ? setPasswordValid(true) : setPasswordValid(false);
-
 
         if (emailValid && validPassword) {
             setPassword(e.currentTarget.value);
@@ -47,6 +48,7 @@ export default function Auth(props: AuthProps) {
     }
 
     const authenticateUser = async (email: string, password: string) => {
+        setUserAuthErr(false);
         const req = {
             method: 'POST',
             headers: {
@@ -59,19 +61,18 @@ export default function Auth(props: AuthProps) {
             const res = await fetch('/api/authAPI/userAuth', req);
       
             if (!res.ok) {
-              const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the user data');
-              throw error;
+              const error: NodeJS.ErrnoException  = new Error ('An error occured while fetching the data');
+              setUserAuthErr(true);
+            } else {
+                const data = await res.json();
+                const { usrObj: user } = data;
+                localStorage.setItem('user', JSON.stringify(user));
+                alert(`Welcome ${user.firstname} ${user.lastname}`)
+                setUserAuthenticated(true);
+                handleSignIn(user);
             }
-      
-            const data = await res.json();
-            const { usrObj: user } = data;
-            localStorage.setItem('user', JSON.stringify(user));
-            setUserAuthenticated(true);
-            handleSignIn(user);
-            
           } catch (error: any) {
-              console.error(error)
-              throw error;
+              setUserAuthErr(true);
           }
     }
 
@@ -94,12 +95,23 @@ export default function Auth(props: AuthProps) {
                             <div className="mx-auto w-1/2">
                                 {
                                     userAuthenticated
-                                        ? <div>Welcome User</div>
-                                        : <SignInForm 
-                                            handleSubmit = {handleSubmit}
-                                            handleEmailChange = {handleEmailChange}
-                                            handlePasswordChange = {handlePasswordChange}
-                                            submitAllowed = {submitAllowed} />
+                                        ? <div>
+                                            <h2>Welcome {email}</h2>
+                                          </div>
+                                        : <>
+                                            <h2 className=" text-xl mb-5">Sign in</h2>
+                                            <SignInForm 
+                                                handleSubmit = {handleSubmit}
+                                                handleEmailChange = {handleEmailChange}
+                                                handlePasswordChange = {handlePasswordChange}
+                                                submitAllowed = {submitAllowed} />
+                                          </>
+
+                                }
+                                {
+                                    userAuthErr
+                                        ? <p className="text-red-500">Invalid Login Credentials</p>
+                                        : null
                                 }
                             </div>
                         </div>
@@ -107,7 +119,7 @@ export default function Auth(props: AuthProps) {
                 </div>
                 <div className="flex-col basis-[43%]" >
                     <div className="relative h-screen w-[100%]">
-                        <Image src='/auth.png' layout="fill"/>
+                        <Image src='/auth.png' layout="fill" priority={true}/>
                     </div>
                 </div>
             </div>
