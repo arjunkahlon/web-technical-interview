@@ -107,7 +107,7 @@ export default function Auth(props: AuthProps) {
                 </div>
                 <div className="flex-col basis-[43%]" >
                     <div className="relative h-screen w-[100%]">
-                        <Image src='/house.png' layout="fill"/>
+                        <Image src='/auth.png' layout="fill"/>
                     </div>
                 </div>
             </div>
